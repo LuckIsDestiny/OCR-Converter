@@ -1,7 +1,6 @@
-<<<<<<< HEAD
 # OCR-Converter
 OCR Converter is a web application that allows users to upload PDF files and process them using OCR (Optical Character Recognition) to make the text selectable and searchable.
-=======
+
 # OCR Converter
 
 OCR Converter is a web application built using **FastAPI** and **Dropzone.js** that allows users to upload PDF files and process them using OCR (Optical Character Recognition) to make the text selectable and searchable. The OCR process is powered by **ocrmypdf** in a Dockerized environment.
@@ -60,4 +59,3 @@ OCR Converter is a web application built using **FastAPI** and **Dropzone.js** t
 
 ## License
 OCR Converter is licensed under the GNU GPL v3.
->>>>>>> 821f9f0 (Initial commit)
