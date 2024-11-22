@@ -1,0 +1,6 @@
+ ocrmypdf --redo-ocr --optimize 3 -l eng PublicWaterMassMailing.pdf output-ocr2.pdf
+
+
+
+
+ ocrmypdf --redo-ocr --optimize 1 -l eng 5_Vakkalath_1.pdf output-ocr11.pdf

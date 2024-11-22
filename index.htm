@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OCR Converter</title>
+
+    <script src="static/dropzone.js"></script>
+    <link rel="stylesheet" href="static/dropzone.css" />
+
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #e0f7fa, #80deea);
+        color: #333;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      .container {
+        background: #fff;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 900px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #00796b;
+        font-size: 36px;
+        margin-bottom: 20px;
+      }
+
+      .dropzone {
+        border: 2px dashed #00796b;
+        padding: 40px;
+        border-radius: 16px;
+        background-color: #e0f2f1;
+        color: #00796b;
+        text-align: center;
+        font-size: 18px;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        cursor: pointer;
+      }
+
+      .dropzone:hover {
+        background-color: #b2dfdb;
+        transform: scale(1.02);
+      }
+
+      .dropzone .dz-message {
+        font-size: 16px;
+        font-weight: 500;
+      }
+
+      #processingMessage {
+        display: none;
+        text-align: center;
+        margin-top: 20px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #ffa000;
+        animation: fadeIn 0.5s;
+      }
+
+      #fileControls {
+        display: none;
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 30px;
+        font-size: 14px;
+        color: #555;
+      }
+
+      footer a {
+        color: #00796b;
+        text-decoration: none;
+        font-weight: bold;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
+      }
+
+      select {
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        outline: none;
+        margin-top: 20px;
+        background: #f7f7f7;
+        transition: box-shadow 0.3s;
+      }
+
+      select:focus {
+        box-shadow: 0 0 8px rgba(0, 121, 107, 0.5);
+      }
+
+      #startOCR,
+      #downloadButton,
+      #downloadAllButton {
+        padding: 12px 24px;
+        font-size: 16px;
+        background-color: #00796b;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+      }
+
+      #startOCR:hover,
+      #downloadButton:hover,
+      #downloadAllButton:hover {
+        background-color: #004d40;
+        transform: translateY(-2px);
+      }
+
+      #startOCR:active,
+      #downloadButton:active,
+      #downloadAllButton:active {
+        transform: translateY(1px);
+      }
+
+      .dz-preview .dz-details {
+        position: relative;
+        padding-bottom: 40px;
+      }
+
+      .dz-preview .dz-details .download-btn {
+        position: relative;
+        bottom: 10px;
+        background-color: #00796b;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        cursor: pointer;
+        border-radius: 8px;
+        margin-top: 10px;
+        text-align: center;
+      }
+
+      .dz-preview .dz-details .download-btn:hover {
+        background-color: #004d40;
+      }
+
+      .optimize-select {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .optimize-select label {
+        font-size: 16px;
+        margin-top: 3%;
+        margin-right: 2%;
+        font-weight: bold;
+        color: #00796b;
+        cursor: help;
+      }
+
+      .optimize-select select {
+        padding: 11px 20px;
+        font-size: 16px;
+        border: 1px solid #00796b;
+        border-radius: 8px;
+        background-color: #f0f0f0;
+        transition: border-color 0.3s ease;
+        margin-right: 3cqh;
+      }
+
+      .optimize-select select:hover {
+        border-color: #00796b;
+      }
+
+      .optimize-select select:focus {
+        outline: none;
+        border-color: #004d40;
+        box-shadow: 0 0 4px rgba(0, 121, 107, 0.5);
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>OCR Converter</h1>
+
+      <form action="/ocr" class="dropzone" id="dzOCR">
+        <div class="dz-message">
+          <span>Drag & Drop or Click to Upload a PDF for OCR</span>
+        </div>
+      </form>
+
+      <!-- Optimize parameter selection -->
+      <div class="optimize-select">
+        <label for="optimize">Optimization Level:</label>
+        <select id="optimize" name="optimize">
+          <option value="1">Low</option>
+          <option value="2">Medium</option>
+          <option value="3" selected>High</option>
+        </select>
+        <button id="startOCR" type="button">Start OCR</button>
+      </div>
+
+      <!-- Processing message -->
+      <div id="processingMessage">
+        Processing... Please wait while your file is being OCR processed.
+      </div>
+
+      <!-- File controls with Download All button -->
+      <div id="fileControls">
+        <button
+          type="button"
+          id="downloadAllButton"
+          onclick="downloadAllPDFs()"
+        >
+          Download All
+        </button>
+      </div>
+
+      <footer>
+        <p>Developed By <a href="#">Highcourt Kerala IT</a></p>
+      </footer>
+    </div>
+
+    <script>
+      let filesProcessing = 0;
+      let processedFiles = [];
+      const dropzone = new Dropzone("#dzOCR", {
+        autoProcessQueue: false,
+        parallelUploads: 100,
+        maxFiles: 256,
+        init: function () {
+          this.on("sending", function (file, xhr, formData) {
+            filesProcessing++;
+            if (filesProcessing === 1) {
+              document.getElementById("processingMessage").style.display =
+                "block";
+            }
+            const optimize = document.getElementById("optimize").value;
+            formData.append("optimize", optimize);
+          });
+
+          this.on("success", function (file, response, e) {
+            const fn = "ocr-" + file.name;
+            processedFiles.push({ name: fn, data: e.target.response });
+
+            filesProcessing--;
+            if (filesProcessing === 0) {
+              document.getElementById("processingMessage").style.display =
+                "none";
+            }
+
+            document.getElementById("fileControls").style.display = "block";
+
+            const downloadButton = document.createElement("button");
+            downloadButton.classList.add("download-btn");
+            downloadButton.textContent = "Download";
+
+            downloadButton.addEventListener("click", function (event) {
+              event.preventDefault();
+              saveData(e.target.response, fn, "application/pdf");
+            });
+
+            const previewElement =
+              file.previewElement.querySelector(".dz-details");
+            previewElement.appendChild(downloadButton);
+          });
+
+          this.on("error", function (file, errorMessage, xhr) {
+            filesProcessing--;
+            if (filesProcessing === 0) {
+              document.getElementById("processingMessage").style.display =
+                "none";
+            }
+            alert(
+              "An error occurred while processing the file. Please try again."
+            );
+          });
+        },
+      });
+
+      // Handle Start OCR button click
+      document
+        .getElementById("startOCR")
+        .addEventListener("click", function () {
+          dropzone.processQueue(); // Start processing files
+        });
+
+      // Handle Download All button
+      document
+        .getElementById("downloadAllButton")
+        .addEventListener("click", function () {
+          processedFiles.forEach((file) => {
+            saveData(file.data, file.name, "application/pdf");
+          });
+        });
+
+      // Utility function for saving files
+      function saveData(data, filename, type) {
+        const blob = new Blob([data], { type });
+        const a = document.createElement("a");
+        a.href = window.URL.createObjectURL(blob);
+        a.download = filename;
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    </script>
+  </body>
+</html>
