@@ -5,16 +5,24 @@ import subprocess
 
 app = FastAPI()
 
+# Serve the HTML file for the user interface
 @app.get("/", response_class=FileResponse)
 def index():
     return "index.htm"
 
+# Serve static files from the "static" directory
 @app.get("/static/{fn}", response_class=FileResponse)
 async def static(fn: str):
     return f"static/{fn}"
 
+# Process the uploaded file for OCR and return the resulting PDF file
 @app.post("/ocr", response_class=FileResponse)
-async def ocr(optimize: int = Form(...), language: str = "eng", file: UploadFile = File(...)):
+async def ocr(
+    optimize: int = Form(...),
+    forceOCR: bool = Form(False),
+    language: str = "eng",
+    file: UploadFile = File(...)
+):
     # Ensure only one file is uploaded
     if not file:
         raise Exception("Need exactly one file!")
@@ -28,9 +36,12 @@ async def ocr(optimize: int = Form(...), language: str = "eng", file: UploadFile
         f_in.write(content)
         f_in.flush()
 
+        # Determine the OCR mode
+        ocr_flag = "--force-ocr" if forceOCR else "--redo-ocr"
+
         # Run OCR command
         proc = subprocess.Popen(
-            ["ocrmypdf", "--redo-ocr", f"--optimize={optimize}", "-l", language, f_in.name, f_out.name]
+            ["ocrmypdf", ocr_flag, "--clean", f"--optimize={optimize}", "-l", language, f_in.name, f_out.name]
         )
 
         # Wait for OCR to finish
