@@ -19,7 +19,14 @@ OCR Converter is a web application built using **FastAPI** and **Dropzone.js** t
 
 ### Setup
 
-1. **Build the Docker image:**
+1. **Clone the repository:**
+
+    ```bash
+    git clone <repository_url>
+    cd <project_folder>
+    ```
+
+2. **Build the Docker image:**
 
     First, make sure Docker is installed and running on your machine.
 
@@ -27,7 +34,7 @@ OCR Converter is a web application built using **FastAPI** and **Dropzone.js** t
     docker build -t ocr-converter .
     ```
 
-2. **Run the Docker container:**
+1. **Run the Docker container:**
 
     Once the image is built, run the container:
 
@@ -35,7 +42,7 @@ OCR Converter is a web application built using **FastAPI** and **Dropzone.js** t
     docker run -d -p 8000:8000 ocr-converter
     ```
 
-3. **Access the application:**
+4. **Access the application:**
 
     Open your browser and navigate to `http://localhost:8000`. The application interface should appear, where you can upload your PDF files for OCR processing.
 
